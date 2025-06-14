@@ -16,15 +16,15 @@ struct ToolbarButtonStyle: ButtonStyle {
         self.lightColor = lightColor
         self.darkColor = darkColor
     }
-    
-    private var backingColor: Color {
+        
+    @available(macOS 26.0, *)
+    private var glassTint: Color {
         if !hovering {
             colorScheme == .light ? lightColor : darkColor
         } else {
-            colorScheme == .light ? .black.opacity(0.1) : .white.opacity(0.05)
+            colorScheme == .light ? lightColor.exposureAdjust(1) : darkColor.exposureAdjust(1)
         }
     }
-    @Namespace var namespace
 
     func makeBody(configuration: Configuration) -> some View {
         if #available(macOS 26.0, *) {
@@ -32,11 +32,9 @@ struct ToolbarButtonStyle: ButtonStyle {
                 .label
                 .foregroundColor(.white)
                 .padding(EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 8))
-                .glassEffect(.regular.tint(backingColor), in: .capsule, isEnabled: true)
+                .glassEffect(.regular.tint(glassTint), in: .capsule, isEnabled: true)
                 .onHover { hovering in
-                    withAnimation {
-                        self.hovering = hovering
-                    }
+                    self.hovering = hovering
                 }
         } else {
             configuration
